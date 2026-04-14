@@ -226,6 +226,6 @@ Clean terminal-aesthetic dashboard — trigger scans, see hosts, ports, and vend
 
 ## License
 
-[XcoBean Community License v1.0](LICENSE) — MIT-based with attribution.
+Apache License 2.0 — see [LICENSE](LICENSE). Attribution requirements per §4(d) are in [NOTICE](NOTICE). Trademark usage: [TRADEMARK.md](TRADEMARK.md).
 
 Built on XcoBean open technology — https://xcobean.co.ke
