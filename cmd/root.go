@@ -35,6 +35,7 @@ Examples:
   netscan watch                    # continuous monitoring
   netscan ports <host>             # deep port scan a single host`,
 	Version: appVersion,
+	Args:    cobra.MaximumNArgs(1),
 	RunE:    runScan,
 }
 
