@@ -29,6 +29,7 @@ Examples:
 	RunE: func(cmd *cobra.Command, args []string) error {
 		interval, _ := cmd.Flags().GetInt("interval")
 		iface, _ := cmd.Flags().GetString("interface")
+		promPort, _ := cmd.Flags().GetString("prometheus-port")
 
 		var subnet string
 		if len(args) > 0 {
@@ -39,6 +40,13 @@ Examples:
 			if err != nil {
 				return fmt.Errorf("auto-detecting subnet: %w", err)
 			}
+		}
+
+		if promPort != "" {
+			if err := startMetricsServer(promPort); err != nil {
+				return fmt.Errorf("metrics server: %w", err)
+			}
+			fmt.Printf("Prometheus metrics on http://localhost%s/metrics\n", promPort)
 		}
 
 		fmt.Printf("Watching %s (every %ds, Ctrl+C to stop)\n\n", subnet, interval)
@@ -58,6 +66,7 @@ Examples:
 		defer ticker.Stop()
 
 		scan := func() {
+			globalMetrics.ScanStarted()
 			hosts := scanner.PingSweep(ips, timeout, 256)
 
 			arpTable := scanner.GetARPTable()
@@ -69,6 +78,9 @@ Examples:
 			}
 
 			scanner.ResolveHostnames(hosts)
+
+			globalMetrics.SetHostsUp(len(hosts))
+			globalMetrics.ScanFinished()
 
 			current := make(map[string]bool)
 			for _, h := range hosts {
@@ -169,6 +181,7 @@ Examples:
 func init() {
 	watchCmd.Flags().IntP("interval", "n", 60, "Scan interval in seconds")
 	watchCmd.Flags().StringP("interface", "i", "", "Network interface")
+	watchCmd.Flags().String("prometheus-port", "", "Expose Prometheus metrics on this address (e.g. :9100)")
 
 	wakeCmd.Flags().StringP("broadcast", "b", "255.255.255.255", "Broadcast address")
 }

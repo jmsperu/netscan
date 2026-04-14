@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>netscan — Network Scanner</title>
+<style>
+  :root {
+    --bg: #0a0e14;
+    --panel: #111822;
+    --border: #1f2937;
+    --text: #e5e7eb;
+    --muted: #64748b;
+    --accent: #00ff88;
+    --danger: #ef4444;
+    --warning: #f59e0b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    background: var(--bg);
+    color: var(--text);
+    padding: 20px;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+  }
+  h1 { font-size: 1.4rem; color: var(--accent); font-weight: 700; letter-spacing: 2px; }
+  h1::before { content: ">_ "; opacity: 0.6; }
+  .controls { display: flex; gap: 10px; }
+  input, button, select {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    border-radius: 4px;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--accent); }
+  button {
+    cursor: pointer;
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 700;
+    border: none;
+  }
+  button:hover { opacity: 0.85; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 15px;
+    border-radius: 6px;
+  }
+  .stat-label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+  .stat-value { font-size: 1.8rem; color: var(--accent); font-weight: 700; margin-top: 5px; }
+  .table-wrap {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+  thead { background: #0d1420; border-bottom: 2px solid var(--accent); }
+  th { padding: 12px 15px; text-align: left; color: var(--muted); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; }
+  td { padding: 10px 15px; border-bottom: 1px solid var(--border); }
+  tr:hover { background: rgba(0, 255, 136, 0.03); }
+  .ip { color: var(--accent); font-weight: 600; }
+  .mac { color: var(--muted); }
+  .ports { display: flex; flex-wrap: wrap; gap: 5px; }
+  .port {
+    background: #0d2414;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 0.75rem;
+  }
+  .status { display: inline-block; padding: 3px 10px; border-radius: 3px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+  .status.up { background: rgba(0, 255, 136, 0.15); color: var(--accent); }
+  .status.scanning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+  .empty { padding: 40px; text-align: center; color: var(--muted); }
+  #log { font-family: inherit; font-size: 0.8rem; max-height: 150px; overflow-y: auto; background: #050709; padding: 10px; margin-top: 15px; border-radius: 4px; }
+  .log-entry { color: var(--muted); margin-bottom: 3px; }
+  .log-entry .ts { color: var(--accent); opacity: 0.6; }
+  footer { text-align: center; margin-top: 30px; color: var(--muted); font-size: 0.75rem; }
+  footer a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>NETSCAN</h1>
+  <div class="controls">
+    <input type="text" id="subnet" placeholder="e.g. 192.168.1.0/24" value="">
+    <select id="mode">
+      <option value="fast">Fast (ping only)</option>
+      <option value="full" selected>Full (ports)</option>
+      <option value="all">All 65535 ports</option>
+    </select>
+    <button id="scan-btn" onclick="startScan()">Scan</button>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-label">Status</div>
+    <div class="stat-value" id="status-value"><span class="status up">Ready</span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Hosts Up</div>
+    <div class="stat-value" id="hosts-up">0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Open Ports</div>
+    <div class="stat-value" id="open-ports">0</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">Last Scan</div>
+    <div class="stat-value" id="last-scan" style="font-size: 1rem;">—</div>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>IP</th>
+        <th>MAC</th>
+        <th>Vendor</th>
+        <th>Hostname</th>
+        <th>Open Ports</th>
+      </tr>
+    </thead>
+    <tbody id="results">
+      <tr><td colspan="5" class="empty">No scans yet — click Scan to begin.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="log"></div>
+
+<footer>
+  <p>Powered by <a href="https://github.com/jmsperu/netscan" target="_blank">netscan</a> — Built on XcoBean open technology — <a href="https://xcobean.co.ke" target="_blank">xcobean.co.ke</a></p>
+</footer>
+
+<script>
+function log(msg) {
+  const el = document.getElementById('log');
+  const ts = new Date().toTimeString().split(' ')[0];
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="ts">[${ts}]</span> ${msg}`;
+  el.appendChild(entry);
+  el.scrollTop = el.scrollHeight;
+}
+
+async function startScan() {
+  const subnet = document.getElementById('subnet').value.trim();
+  const mode = document.getElementById('mode').value;
+  const btn = document.getElementById('scan-btn');
+  const statusEl = document.getElementById('status-value');
+
+  btn.disabled = true;
+  btn.textContent = 'Scanning...';
+  statusEl.innerHTML = '<span class="status scanning">Scanning</span>';
+  log(`Starting scan: subnet=${subnet || 'auto'} mode=${mode}`);
+
+  try {
+    const res = await fetch('/api/scan', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({subnet, mode})
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      log('ERROR: ' + data.error);
+      statusEl.innerHTML = '<span class="status" style="background:rgba(239,68,68,0.15);color:var(--danger)">Error</span>';
+      return;
+    }
+
+    renderResults(data.hosts || []);
+    document.getElementById('hosts-up').textContent = (data.hosts || []).length;
+    document.getElementById('open-ports').textContent = countPorts(data.hosts || []);
+    document.getElementById('last-scan').textContent = new Date().toLocaleTimeString();
+    statusEl.innerHTML = '<span class="status up">Ready</span>';
+    log(`Scan complete: ${(data.hosts || []).length} hosts`);
+  } catch (e) {
+    log('ERROR: ' + e.message);
+    statusEl.innerHTML = '<span class="status" style="background:rgba(239,68,68,0.15);color:var(--danger)">Error</span>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Scan';
+  }
+}
+
+function countPorts(hosts) {
+  return hosts.reduce((sum, h) => sum + (h.ports ? h.ports.length : 0), 0);
+}
+
+function renderResults(hosts) {
+  const tbody = document.getElementById('results');
+  if (!hosts.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty">No hosts found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = hosts.map(h => `
+    <tr>
+      <td class="ip">${h.ip || '-'}</td>
+      <td class="mac">${h.mac || '-'}</td>
+      <td>${h.vendor || '-'}</td>
+      <td>${h.hostname || '-'}</td>
+      <td class="ports">${(h.ports || []).map(p => `<span class="port">${p}</span>`).join('')}</td>
+    </tr>
+  `).join('');
+}
+
+// Load initial state
+fetch('/api/status').then(r => r.json()).then(data => {
+  if (data.subnet) document.getElementById('subnet').placeholder = `e.g. ${data.subnet}`;
+}).catch(() => {});
+</script>
+</body>
+</html>
