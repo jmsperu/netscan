@@ -113,4 +113,6 @@ netscan wake AA:BB:CC:DD:EE:FF -b 192.168.1.255   # specify broadcast address
 
 ## License
 
-MIT
+[XcoBean Community License v1.0](LICENSE) — MIT-based with attribution.
+
+Built on XcoBean open technology — https://xcobean.co.ke

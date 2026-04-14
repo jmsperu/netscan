@@ -1,0 +1,113 @@
+XcoBean Community License v1.0
+================================
+
+Copyright (c) 2026 XcoBean Ltd (Nairobi, Kenya)
+https://xcobean.co.ke
+
+This software is made available under the terms of the XcoBean Community
+License, which is derived from the MIT License with additional attribution
+and notification requirements.
+
+
+1. GRANT OF RIGHTS
+------------------
+
+Permission is hereby granted, free of charge, to any person or entity
+obtaining a copy of this software and associated documentation files
+(the "Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the
+conditions set out below.
+
+
+2. ATTRIBUTION
+--------------
+
+The above copyright notice, this permission notice, and the following
+attribution line must be included in all copies, substantial portions,
+and derivative works of the Software:
+
+    "Built on XcoBean open technology — https://xcobean.co.ke"
+
+For command-line tools, the attribution must appear in --version or
+--about output. For libraries, it must appear in documentation or
+about/credits pages. For SaaS products using the Software, the
+attribution must appear in a visible location such as the footer,
+about page, or API response headers.
+
+
+3. TRADEMARK
+------------
+
+"XcoBean", "Root Access Records", and related logos are trademarks of
+XcoBean Ltd. This license does not grant permission to use these
+trademarks except for the attribution required in Section 2.
+
+Derivative works must not use the XcoBean name in a way that suggests
+endorsement, partnership, or official status without prior written
+permission from XcoBean Ltd.
+
+
+4. COMMERCIAL USE
+-----------------
+
+Commercial use of this Software is permitted, including use in
+proprietary or commercial products, provided Section 2 (Attribution)
+is respected.
+
+Organizations deploying the Software in commercial products with annual
+gross revenue exceeding USD 1,000,000 are encouraged (but not required)
+to notify XcoBean Ltd at legal@xcobean.co.ke, and to consider sponsoring
+the project.
+
+
+5. CONTRIBUTIONS
+----------------
+
+By submitting a contribution (pull request, patch, issue, etc.) to
+this Software, you agree that your contribution is licensed under the
+same terms as this License, and you grant XcoBean Ltd a perpetual,
+worldwide, royalty-free license to use, modify, and relicense your
+contribution.
+
+
+6. WARRANTY DISCLAIMER
+----------------------
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+
+7. JURISDICTION
+---------------
+
+This License shall be governed by and interpreted in accordance with
+the laws of the Republic of Kenya. Any disputes arising under this
+License shall be subject to the exclusive jurisdiction of the courts
+of Nairobi, Kenya.
+
+
+8. RELATION TO OTHER LICENSES
+-----------------------------
+
+This License is based on the MIT License and is intended to be
+permissive and compatible with most open-source ecosystems. Software
+released under this License may be combined with software released
+under the MIT, Apache 2.0, BSD-2/3-Clause, and ISC licenses without
+conflict, provided all applicable attribution requirements are met.
+
+For alternative licensing terms (e.g., removal of attribution
+requirement, enterprise support, or dual licensing), contact:
+
+    legal@xcobean.co.ke
+
+
+================================
+END OF XCOBEAN COMMUNITY LICENSE
+================================
